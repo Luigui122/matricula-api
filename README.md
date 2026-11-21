@@ -1,98 +1,109 @@
-# matricula-api
+## Pregunta 1: Pruebas automatizadas de matrícula
 
-Proyecto de automatización de pruebas para el proceso de matrícula de CIBERTEC, desarrollado para el curso de Pruebas de Software utilizando BDD con Gherkin, Cucumber, Serenity BDD, Screenplay y Rest Assured.
+Se realizaron cinco escenarios de pruebas automatizadas utilizando Cucumber, Gherkin, Serenity BDD, Screenplay y Rest Assured.
 
-Se implementaron tres escenarios automatizados para comprobar el funcionamiento de la cotización, el registro y pago de matrículas, y la validación de reglas de negocio.
+### Escenario 1: Cotizar curso
 
-## Pruebas automatizadas
+Se verifica la cotización del curso, los créditos, el subtotal, el descuento y el total.
 
-### 1. Cotización de curso
+```json
+{
+  "codigoAlumno": "i202610003",
+  "cursos": ["TS5514"],
+  "creditos": 4,
+  "subtotal": 480,
+  "descuento": 0,
+  "total": 480
+}
+```
 
-Se realizó una prueba para verificar que un alumno pueda consultar el costo de un curso antes de matricularse.
+### Escenario 2: Registrar matrícula
 
-**Datos utilizados:**
-- Alumno: `i202610003`
-- Curso: `TS5514`
+Se verifica que la matrícula se registre correctamente.
 
-**Resultado obtenido:**
+```json
+{
+  "id": 21,
+  "codigoAlumno": "i202610003",
+  "codigoCurso": "TS5514",
+  "periodo": "2026-2",
+  "horario": "JUEVES 08:00-12:00",
+  "creditos": 4,
+  "monto": 480,
+  "estado": "REGISTRADA",
+  "nota": null,
+  "condicion": null,
+  "fechaRegistro": "2026-11-21T00:43:08.5145514",
+  "fechaPago": null
+}
+```
 
-| Campo | Resultado |
-|---|---:|
-| Créditos | 4 |
-| Subtotal | S/ 480 |
-| Descuento | S/ 0 |
-| Total | S/ 480 |
+### Escenario 3: Pagar matrícula
 
-Se comprobó que la API calcule y devuelva correctamente el importe de la cotización.
+Se verifica que el pago se procese correctamente y que el estado cambie a PAGADA.
 
-### 2. Matrícula válida y pago mediante YAPE
+```json
+{
+  "id": 21,
+  "codigoAlumno": "i202610003",
+  "codigoCurso": "TS5514",
+  "periodo": "2026-2",
+  "horario": "JUEVES 08:00-12:00",
+  "creditos": 4,
+  "monto": 480,
+  "estado": "PAGADA",
+  "nota": null,
+  "condicion": null,
+  "fechaRegistro": "2026-11-21T00:43:08.514551",
+  "fechaPago": "2026-11-21T00:47:22.9929753"
+}
+```
 
-Se automatizó el proceso de matrícula y pago de un curso. Primero se registra la matrícula y luego se utiliza el ID generado por la API para realizar el pago mediante YAPE. Finalmente, se consulta el pago para verificar que se haya registrado correctamente.
+### Escenario 4: Verificar pago
 
-**Datos utilizados:**
-- Alumno: `i202610003`
-- Curso: `TS5514`
-- Método de pago: `YAPE`
+Se verifica que el pago esté registrado con el método YAPE y el monto correspondiente.
 
-**Resultados obtenidos:**
+```json
+{
+  "id": 16,
+  "numeroOperacion": "OP-000016",
+  "idMatricula": 21,
+  "codigoAlumno": "i202610003",
+  "codigoCurso": "TS5514",
+  "periodo": "2026-2",
+  "metodo": "YAPE",
+  "monto": 480,
+  "fecha": "2026-11-21T00:47:22.992975"
+}
+```
 
-| Validación | Resultado |
-|---|---|
-| Registro de matrícula | HTTP 201 |
-| Estado inicial | REGISTRADA |
-| Pago de matrícula | HTTP 200 |
-| Estado final | PAGADA |
-| Monto pagado | S/ 480 |
-| Número de operación | OP-000016 |
+### Escenario 5: Matrícula rechazada
 
-Se verificó que la matrícula cambie a estado `PAGADA`, que se registre la fecha del pago y que el pago esté asociado a la matrícula creada.
+Se verifica que el sistema rechace la matrícula cuando el curso pertenece a otra carrera.
 
-### 3. Rechazo de matrícula por carrera diferente
+```json
+{
+  "detail": "El curso AD5101 pertenece a la carrera AE",
+  "instance": "/api/matriculas",
+  "status": 422,
+  "title": "Unprocessable Content",
+  "codigo": "CURSO_DE_OTRA_CARRERA"
+}
+```
 
-Se realizó una prueba negativa para comprobar que un alumno no pueda matricularse en un curso que pertenece a otra carrera.
+### Ejecución de pruebas
 
-**Datos utilizados:**
-- Alumno: `i202610003`
-- Curso: `AD5101`
-
-**Resultado obtenido:**
-
-| Validación | Resultado |
-|---|---|
-| Código HTTP | 422 |
-| Código de error | CURSO_DE_OTRA_CARRERA |
-| Resultado | Matrícula rechazada |
-
-Se comprobó que la API rechace correctamente la solicitud y devuelva el código de error esperado.
-
-## Ejecución de las pruebas
-
-Para ejecutar los tres escenarios automatizados en Windows:
+Para ejecutar los escenarios automatizados:
 
 ```powershell
 .\mvnw.cmd test -Dtest=CucumberTestSuite
 ```
 
-## Resultado general
+**Resultado:** Los cinco escenarios se ejecutan mediante Serenity BDD y Cucumber.
 
-Las tres pruebas automatizadas finalizaron correctamente.
+## **_Evidencias_**
 
-| Indicador | Resultado |
-|---|---:|
-| Pruebas ejecutadas | 3 |
-| Fallidas | 0 |
-| Errores | 0 |
-| Omitidas | 0 |
-| Resultado | BUILD SUCCESS |
-
-## Evidencias
-
-Las capturas de los resultados se encuentran en la carpeta `evidencias/`:
+Las capturas de los resultados se encuentran en la carpeta evidencias/:
 
 
-1`01-ejecucion-todos-los-tests.png`
-
----
-
-**CIBERTEC - Curso de Pruebas de Software**  
-**Pregunta 1: Automatización de pruebas con BDD**
+01-ejecucion-todos-los-tests.png
