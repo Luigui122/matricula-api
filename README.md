@@ -1,138 +1,151 @@
-## Pregunta 1: Pruebas automatizadas de matrícula
+# Pregunta 1: Pruebas automatizadas de matrícula
 
-Se realizaron cinco escenarios de pruebas automatizadas utilizando Cucumber, Gherkin, Serenity BDD, Screenplay y Rest Assured.
+Se realizaron pruebas automatizadas utilizando **Cucumber, Gherkin, Serenity BDD, Screenplay y Rest Assured**, con el objetivo de verificar el correcto funcionamiento de los procesos de cotización, registro de matrícula, pago y validación de matrículas duplicadas.
 
-### Escenario 1: Cotizar curso
+## Escenario 1: Cotizar curso
 
-Se verifica la cotización del curso, los créditos, el subtotal, el descuento y el total.
+**Objetivo:** verificar que el sistema calcule correctamente los créditos, subtotal, descuento y total de la cotización.
+
+**Resultado obtenido:**
 
 ```json
 {
-  "codigoAlumno": "i202610003",
-  "cursos": ["TS5514"],
+  "codigoAlumno": "i202610002",
+  "cursos": [
+    "DM5512"
+  ],
   "creditos": 4,
   "subtotal": 480,
-  "descuento": 0,
-  "total": 480
+  "descuento": 10,
+  "total": 432
 }
 ```
 
-### Escenario 2: Registrar matrícula
+**Validación:** se verifica que el subtotal sea 480, se aplique un descuento del 10 % y el total calculado sea 432.
 
-Se verifica que la matrícula se registre correctamente.
+## Escenario 2: Registrar matrícula
+
+**Objetivo:** verificar que la matrícula se registre correctamente y que el monto corresponda al resultado de la cotización.
+
+**Resultado obtenido:**
 
 ```json
 {
-  "id": 21,
-  "codigoAlumno": "i202610003",
-  "codigoCurso": "TS5514",
+  "id": 22,
+  "codigoAlumno": "i202610002",
+  "codigoCurso": "DM5512",
   "periodo": "2026-2",
-  "horario": "JUEVES 08:00-12:00",
+  "horario": "MARTES 08:00-12:00",
   "creditos": 4,
-  "monto": 480,
+  "monto": 432,
   "estado": "REGISTRADA",
   "nota": null,
   "condicion": null,
-  "fechaRegistro": "2026-11-21T00:43:08.5145514",
+  "fechaRegistro": "2026-11-21T00:44:22.8144487",
   "fechaPago": null
 }
 ```
 
-### Escenario 3: Pagar matrícula
+**Validación:** se comprueba que la matrícula se registre con un monto de 432 y estado `REGISTRADA`.
 
-Se verifica que el pago se procese correctamente y que el estado cambie a PAGADA.
+## Escenario 3: Pagar matrícula
+
+**Objetivo:** verificar que el pago se procese correctamente y que el estado de la matrícula cambie a `PAGADA`.
+
+**Resultado obtenido:**
 
 ```json
 {
-  "id": 21,
-  "codigoAlumno": "i202610003",
-  "codigoCurso": "TS5514",
+  "id": 22,
+  "codigoAlumno": "i202610002",
+  "codigoCurso": "DM5512",
   "periodo": "2026-2",
-  "horario": "JUEVES 08:00-12:00",
+  "horario": "MARTES 08:00-12:00",
   "creditos": 4,
-  "monto": 480,
+  "monto": 432,
   "estado": "PAGADA",
   "nota": null,
   "condicion": null,
-  "fechaRegistro": "2026-11-21T00:43:08.514551",
-  "fechaPago": "2026-11-21T00:47:22.9929753"
+  "fechaRegistro": "2026-11-21T00:44:22.814449",
+  "fechaPago": "2026-11-21T00:48:13.2353246"
 }
 ```
 
-### Escenario 4: Verificar pago
+**Validación:** se verifica que el pago se procese correctamente y que la matrícula cambie al estado `PAGADA`.
 
-Se verifica que el pago esté registrado con el método YAPE y el monto correspondiente.
+## Escenario 4: Verificar pago
+
+**Objetivo:** comprobar que el pago quede registrado correctamente, verificando el método de pago y el monto correspondiente.
+
+**Resultado obtenido:**
 
 ```json
 {
-  "id": 16,
-  "numeroOperacion": "OP-000016",
-  "idMatricula": 21,
-  "codigoAlumno": "i202610003",
-  "codigoCurso": "TS5514",
+  "id": 17,
+  "numeroOperacion": "OP-000017",
+  "idMatricula": 22,
+  "codigoAlumno": "i202610002",
+  "codigoCurso": "DM5512",
   "periodo": "2026-2",
-  "metodo": "YAPE",
-  "monto": 480,
-  "fecha": "2026-11-21T00:47:22.992975"
+  "metodo": "TRANSFERENCIA",
+  "monto": 432,
+  "fecha": "2026-11-21T00:48:13.235325"
 }
 ```
 
-### Escenario 5: Matrícula rechazada
+**Validación:** se comprueba que el pago esté registrado mediante `TRANSFERENCIA`, por un monto de 432, asociado a la matrícula con ID 22.
 
-Se verifica que el sistema rechace la matrícula cuando el curso pertenece a otra carrera.
+## Escenario 5: Matrícula rechazada
+
+**Objetivo:** verificar que el sistema rechace una matrícula duplicada cuando el alumno ya se encuentra matriculado en el curso `PS5511`.
+
+**Resultado obtenido:**
 
 ```json
 {
-  "detail": "El curso AD5101 pertenece a la carrera AE",
+  "detail": "El alumno ya está matriculado en PS5511",
   "instance": "/api/matriculas",
-  "status": 422,
-  "title": "Unprocessable Content",
-  "codigo": "CURSO_DE_OTRA_CARRERA"
+  "status": 409,
+  "title": "Conflict",
+  "codigo": "MATRICULA_DUPLICADA"
 }
 ```
 
-### Ejecución de pruebas
+**Validación:** se comprueba que el sistema rechace la operación con HTTP `409 Conflict` y devuelva el código de error `MATRICULA_DUPLICADA`.
 
-Para ejecutar los escenarios automatizados:
+## Ejecución de las pruebas automatizadas
+
+Para ejecutar la suite de pruebas correspondiente a la Pregunta 1, se utiliza el siguiente comando en la terminal de PowerShell:
 
 ```powershell
 .\mvnw.cmd test -Dtest=CucumberTestSuite
 ```
 
-**Resultado:** Los cinco escenarios se ejecutan mediante Serenity BDD y Cucumber.
+**Resultado esperado:** ejecución de los escenarios automatizados mediante Serenity BDD y Cucumber, verificando los procesos de cotización, registro de matrícula, pago, consulta del pago y rechazo de matrícula duplicada.
 
-## **_Evidencias_**
+## Evidencias
 
-Las capturas de los resultados se encuentran en la carpeta evidencias/:
+Las capturas de pantalla de los resultados de ejecución se encuentran en la carpeta `evidencias/`.
 
+**Archivo de evidencia:**
 
-01-ejecucion-todos-los-tests.png
+```text
+evidencias/
+└── 01-ejecucion-todos-los-tests.png
+```
 
+## Conclusión
 
-# Pregunta 2: Seguridad de la API con Serenity Screenplay
+Las pruebas automatizadas permiten verificar el correcto funcionamiento de los procesos principales de matrícula, desde la cotización del curso hasta el registro y confirmación del pago.
 
-## 1. Objetivo
-
-Validar la seguridad de la API de matrícula mediante pruebas realizadas en Swagger UI, comprobando la autenticación, rotación de tokens, cierre de sesión, bloqueo de cuentas por intentos fallidos y control de acceso según el rol del usuario.
-
-**Swagger UI:**
-
-`http://localhost:8080/swagger-ui/index.html`
-
-**Usuario de prueba:**
-
-| Campo | Valor |
-|---|---|
-| Username | `i202610003` |
-| Nombre | Carla Quispe |
-| Rol | `ALUMNO` |
-| Contraseña | `Cibertec2026` |
-
+También permiten comprobar que el sistema aplique sus reglas de negocio correctamente, evitando el registro de matrículas duplicadas. La integración de Cucumber, Gherkin, Serenity BDD, Screenplay y Rest Assured facilita la organización, ejecución y validación de los escenarios de prueba.
 ---
 
 ## 2. Escenario 1: Rotación del refresh token
 
 **Objetivo:** comprobar que un refresh token solo pueda utilizarse una vez y que su reutilización cierre las sesiones del usuario.
+
+**Usuario:** `i202610002` – Luis Ramos.
 
 ### Paso 1. Iniciar sesión
 
@@ -144,7 +157,7 @@ Validar la seguridad de la API de matrícula mediante pruebas realizadas en Swag
 
 ```json
 {
-  "username": "i202610003",
+  "username": "i202610002",
   "password": "Cibertec2026"
 }
 ```
@@ -171,7 +184,7 @@ Se envía el `refreshToken` obtenido durante el inicio de sesión.
   "refreshToken": "<nuevo_refreshToken>",
   "tipo": "Bearer",
   "expiraEn": 900,
-  "username": "i202610003",
+  "username": "i202610002",
   "rol": "ALUMNO"
 }
 ```
@@ -224,6 +237,8 @@ Se utiliza el access token generado durante la renovación anterior.
 
 **Objetivo:** comprobar que, después de cerrar sesión, el access token utilizado deje de ser válido.
 
+**Usuario:** `i202610002` – Luis Ramos.
+
 ### Paso 1. Iniciar sesión
 
 **Endpoint:**
@@ -234,7 +249,7 @@ Se utiliza el access token generado durante la renovación anterior.
 
 ```json
 {
-  "username": "i202610003",
+  "username": "i202610002",
   "password": "Cibertec2026"
 }
 ```
@@ -256,8 +271,6 @@ Authorization: Bearer <accessToken>
 ```
 
 **Resultado:** HTTP `204 No Content`.
-
-**Mensaje:** Sesión cerrada.
 
 ### Paso 3. Consultar el perfil después del logout
 
@@ -289,17 +302,15 @@ Se utiliza el mismo access token con el que se cerró sesión.
 
 **Objetivo:** comprobar que la cuenta se bloquee después de cinco intentos fallidos y que no permita iniciar sesión incluso utilizando la contraseña correcta durante el periodo de bloqueo.
 
-**Usuario de prueba:**
+**Usuario exclusivo para esta prueba:** `i202610004`.
 
-`i202610004`
-
-### Paso 1. Realizar cinco intentos fallidos
+### Paso 1. Realizar cuatro intentos fallidos
 
 **Endpoint:**
 
 `POST /api/auth/login`
 
-**Request utilizado en los primeros cuatro intentos:**
+**Request:**
 
 ```json
 {
@@ -341,7 +352,7 @@ Se vuelve a enviar la misma petición.
 
 ```json
 {
-  "detail": "Cuenta bloqueada por intentos fallidos hasta las 04:41",
+  "detail": "Cuenta bloqueada por intentos fallidos hasta las HH:MM",
   "instance": "/api/auth/login",
   "status": 423,
   "title": "Locked",
@@ -368,7 +379,7 @@ Se intenta iniciar sesión nuevamente utilizando la contraseña correcta.
 
 ```json
 {
-  "detail": "Cuenta bloqueada por intentos fallidos hasta las 04:41",
+  "detail": "Cuenta bloqueada por intentos fallidos hasta las HH:MM",
   "instance": "/api/auth/login",
   "status": 423,
   "title": "Locked",
@@ -385,112 +396,4 @@ Se intenta iniciar sesión nuevamente utilizando la contraseña correcta.
 | 3 | 401 | `CREDENCIALES_INVALIDAS` |
 | 4 | 401 | `CREDENCIALES_INVALIDAS` |
 | 5 | 423 | `CUENTA_BLOQUEADA` |
-| Contraseña correcta durante el bloqueo | 423 | `CUENTA_BLOQUEADA` |
-
-**Conclusión:** la API bloquea la cuenta después de cinco intentos fallidos por un periodo de 15 minutos. Durante ese periodo, incluso la contraseña correcta es rechazada.
-
-**Nota:** para repetir este escenario según la consigna, se debe reiniciar la API antes de ejecutarlo nuevamente.
-
----
-
-## 5. Escenario 4: Alumno sin permiso de administrador
-
-**Objetivo:** comprobar que un usuario con rol ALUMNO no pueda acceder a un recurso exclusivo para ADMIN.
-
-### Paso 1. Iniciar sesión como alumno
-
-**Endpoint:**
-
-`POST /api/auth/login`
-
-**Request:**
-
-```json
-{
-  "username": "i202610003",
-  "password": "Cibertec2026"
-}
-```
-
-**Resultado:** HTTP `200 OK`.
-
-### Paso 2. Consultar la lista de alumnos
-
-**Endpoint:**
-
-`GET /api/alumnos`
-
-Se envía el access token del usuario mediante Authorization.
-
-```http
-Authorization: Bearer <accessToken>
-```
-
-**Resultado:** HTTP `403 Forbidden`.
-
-**Response:**
-
-```json
-{
-  "detail": "Su rol no tiene permiso para este recurso",
-  "instance": "/api/alumnos",
-  "status": 403,
-  "title": "Forbidden",
-  "codigo": "ACCESO_DENEGADO"
-}
-```
-
-**Conclusión:** la API valida los permisos según el rol del usuario y rechaza el acceso cuando un alumno intenta utilizar un recurso exclusivo para administradores.
-
----
-
-## 6. Resumen general de resultados
-
-| Escenario | Validación | HTTP | Código |
-|---|---|---:|---|
-| 1 | Renovación inicial del token | 200 | — |
-| 1 | Reutilización del refresh token | 401 | `REFRESH_REUTILIZADO` |
-| 1 | Access token invalidado | 401 | `TOKEN_INVALIDO` |
-| 2 | Cierre de sesión | 204 | — |
-| 2 | Consultar perfil después del logout | 401 | `TOKEN_INVALIDO` |
-| 3 | Cuatro intentos incorrectos | 401 | `CREDENCIALES_INVALIDAS` |
-| 3 | Quinto intento | 423 | `CUENTA_BLOQUEADA` |
-| 3 | Contraseña correcta durante el bloqueo | 423 | `CUENTA_BLOQUEADA` |
-| 4 | Alumno consulta lista de alumnos | 403 | `ACCESO_DENEGADO` |
-
-**Resultado:** los cuatro escenarios fueron ejecutados manualmente en Swagger UI y sus respuestas coincidieron con las reglas de seguridad verificadas.
-
----
-
-## 7. Consideraciones para la automatización
-
-La implementación automatizada se realizará utilizando Serenity BDD, Cucumber, Screenplay y Rest Assured.
-
-Se utilizarán los siguientes componentes:
-
-- `seguridad.feature`: definición de los cuatro escenarios en Gherkin español.
-- `SeguridadStepDefinitions.java`: implementación de los pasos de Cucumber.
-- `IniciarSesion.java`: tarea para autenticar usuarios.
-- `RenovarToken.java`: tarea para renovar los tokens.
-- `CerrarSesion.java`: tarea para cerrar sesiones.
-- `ElCodigoDeError.java`: Question para consultar el código de error.
-- `Hooks.java`: inicialización de los actores e impresión de los datos del estudiante y fecha de ejecución.
-
-Los tokens se almacenarán en memoria del Actor utilizando `remember()` y se recuperarán con `recall()`, evitando el uso de variables estáticas.
-
-**Importante:** las respuestas documentadas corresponden a las pruebas manuales en Swagger. La ejecución automatizada de los cuatro escenarios deberá comprobarse posteriormente con Serenity Screenplay.
-
-## **_Evidencias_**
-
-Las capturas de los resultados se encuentran en la carpeta evidencias/:
-
-
-02-ejecucion-todos-los-tests.png
-
-
-### Ejecución de pruebas
-
-Para ejecutar los escenarios automatizados:
-
-```powershell
-.\mvnw.cmd test -Dtest=CucumberTestSuite
+| Contraseña correcta durante el bloqueo

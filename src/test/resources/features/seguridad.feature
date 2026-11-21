@@ -8,7 +8,7 @@ Característica: Seguridad de la sesión
 
   @seguridad @refresh
   Escenario: Rotación y reutilización del refresh token
-    Dado que el alumno "i202610003" inicia sesión correctamente
+    Dado que el alumno "i202610002" inicia sesión correctamente
     Cuando renueva el refresh token original
     Entonces el código de respuesta es 200
     Cuando reutiliza el refresh token original
@@ -20,7 +20,7 @@ Característica: Seguridad de la sesión
 
   @seguridad @logout
   Escenario: Cerrar sesión e invalidar el access token
-    Dado que el alumno "i202610003" inicia sesión correctamente
+    Dado que el alumno "i202610002" inicia sesión correctamente
     Cuando cierra su sesión
     Entonces el código de respuesta es 204
     Cuando consulta su perfil con el mismo access token
@@ -41,7 +41,7 @@ Característica: Seguridad de la sesión
 
   @seguridad @autorizacion
   Escenario: Alumno intenta acceder a un recurso exclusivo de administrador
-    Dado que el alumno "i202610003" inicia sesión correctamente
+    Dado que el alumno "i202610002" inicia sesión correctamente
     Cuando consulta la lista de alumnos
     Entonces el código de respuesta es 403
     Y el código de error es "ACCESO_DENEGADO"

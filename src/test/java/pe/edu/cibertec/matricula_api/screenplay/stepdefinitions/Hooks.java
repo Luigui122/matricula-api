@@ -11,10 +11,10 @@ import java.time.format.DateTimeFormatter;
 public class Hooks {
 
     private static final String NOMBRE_ESTUDIANTE =
-            "Jhan Hoyny Chiclayo Julca";
+            "Luigui Alejandro Cordova Cahuaza";
 
     private static final String CODIGO_ESTUDIANTE =
-            "i202502594";
+            "i202501352";
 
     @Before
     public void beforeScenario() {
