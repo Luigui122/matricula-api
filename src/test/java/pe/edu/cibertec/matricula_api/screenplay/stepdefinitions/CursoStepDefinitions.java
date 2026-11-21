@@ -6,12 +6,10 @@ import pe.edu.cibertec.matricula_api.screenplay.questions.LaRespuesta;
 import pe.edu.cibertec.matricula_api.screenplay.task.ConsultarCurso;
 import pe.edu.cibertec.matricula_api.screenplay.task.ListarCursos;
 
-import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static net.serenitybdd.screenplay.GivenWhenThen.seeThat;
 
 import static net.serenitybdd.screenplay.actors.OnStage.theActorCalled;
 import static net.serenitybdd.screenplay.actors.OnStage.theActorInTheSpotlight;
-import static net.serenitybdd.screenplay.rest.questions.ResponseConsequence.seeThatResponse;
 import static org.hamcrest.Matchers.equalTo;
 
 public class CursoStepDefinitions {
@@ -37,14 +35,4 @@ public class CursoStepDefinitions {
         theActorInTheSpotlight().should(seeThat(LaRespuesta.cantidadDeElementos(), equalTo(cantidad)));
     }
 
-    @And("la respuesta cumple el esquema {string}")
-    public void laRespuestaCumpleElEsquema(String esquema) {
-        theActorInTheSpotlight().should(
-                seeThatResponse("cumple el esquema " + esquema,
-                        res -> res.body(
-                                matchesJsonSchemaInClasspath("schemas/" + esquema)
-                        )
-                )
-        );
-    }
 }

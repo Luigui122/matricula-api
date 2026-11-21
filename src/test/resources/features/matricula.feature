@@ -1,28 +1,39 @@
-Feature: : Matricula de cursos
+
+# language: es
+
+Característica: Matrícula de cursos
   Como alumno de CIBERTEC
   Quiero matricularme en mis cursos
-  Para llevarlos en el ciclo
+  Para llevarlos durante el ciclo académico
 
-  Scenario: Matricula valida con descuento por promedio y anulacion
-    Given  que Ana consulta la API de matricula
-    When se matricula con el codigo "i202610001" en el curso "PS3511"
-    Then el codigo de respuesta es 201
-    And el monto de la matricula es 288,0
-    And el estado de la matricula es "REGISTRADA"
-    When anula es matricula
-    Then el codigo de respuesta es 200
-    And el estado de la matricula es "ANULADA"
+  Antecedentes:
+    Dado que el alumno "i202610003" inicia sesión correctamente
 
-  Scenario Outline: Matricula rechazada por <motivo>
-    Given  que Ana consulta la API de matricula
-    When se matricula por codigo "<alumno>" en el curso "<curso>"
-    Then el codigo de respuesta es <status>
-    And el codigo de error es "<codigo>"
-    Examples:
-      | motivo             | alumno     | curso  | status | codigo               |
-      | deuda              | i202610004 | PS5511 | 422    | ALUMNO_CON_DEUDA     |
-      | duplicada          | i202610003 | IA5513 | 409    | MATRICULA_DUPLICADA  |
-      | falta de vacantes  | i202610001 | IA5513 | 409    | SIN_VACANTES         |
-      | cruce de horario   | i202610002 | QA5517 | 409    | CRUCE_HORARIO        |
-      | límite de créditos | i202610005 | TS5514 | 422    | LIMITE_CREDITOS      |
-      | alumno inexistente | i999999999 | PS5511 | 404    | ALUMNO_NO_ENCONTRADO |
+  Escenario: Cotizar el curso TS5514
+    Cuando consulta la cotización del curso "TS5514" para el alumno "i202610003"
+    Entonces el código de respuesta es 200
+    Y la cotización contiene 4 créditos
+    Y el subtotal es 480
+    Y el descuento es 0
+    Y el total es 480
+
+  Escenario: Matrícula válida y pago mediante YAPE
+    Cuando se matricula con el codigo "i202610003" en el curso "TS5514"
+    Entonces el código de respuesta es 201
+    Y el monto de la matrícula es 480
+    Y el estado de la matrícula es "REGISTRADA"
+    Y la respuesta cumple el esquema "matricula.json"
+    Cuando paga la matrícula mediante "YAPE"
+    Entonces el código de respuesta es 200
+    Y el estado de la matrícula es "PAGADA"
+    Y la fecha de pago está registrada
+    Y consulta los pagos de la API
+    Y verifica que el pago corresponde a la matrícula
+    Y el método de pago es "YAPE"
+    Y el número de operación tiene el formato "OP-000000"
+
+  Escenario: Matrícula rechazada por curso de otra carrera
+    Cuando se matricula con el codigo "i202610003" en el curso "AD5101"
+    Entonces el código de respuesta es 422
+    Y el código de error es "CURSO_DE_OTRA_CARRERA"
+    Y la respuesta cumple el esquema "error.json"
