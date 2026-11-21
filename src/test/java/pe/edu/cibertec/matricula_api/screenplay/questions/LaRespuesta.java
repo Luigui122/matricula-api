@@ -14,17 +14,14 @@ public class LaRespuesta {
 
     public static Question<Integer> codigoDeEstado() {
         return Question.about("el codigo de estado")
-                .answeredBy(actor ->
-                        SerenityRest.lastResponse().statusCode());
+                .answeredBy(actor -> SerenityRest.lastResponse().statusCode());
     }
-
 
     public static Question<Double> decimal(String campo) {
         return actor -> SerenityRest.lastResponse()
                 .jsonPath()
                 .getDouble(campo);
     }
-
 
     public static Question<String> campo(String ruta) {
         return Question.about("el campo " + ruta)
@@ -43,15 +40,19 @@ public class LaRespuesta {
                 .answeredBy(actor -> {
                     String valor = SerenityRest.lastResponse()
                             .jsonPath().getString(ruta);
+
                     return valor != null && !valor.isBlank();
                 });
     }
 
     public static Question<Integer> cantidadDeElementos() {
         return Question.about("la cantidad de elementos")
-                .answeredBy(actor ->
-                        SerenityRest.lastResponse().jsonPath()
-                                .getList("$").size());
+                .answeredBy(actor -> {
+                    List<?> elementos = SerenityRest.lastResponse()
+                            .jsonPath().getList("$");
+
+                    return elementos == null ? 0 : elementos.size();
+                });
     }
 
     // Comprueba que existe un pago asociado a la matrícula creada.
@@ -65,6 +66,7 @@ public class LaRespuesta {
         return Question.about("el método de pago es " + metodo)
                 .answeredBy(actor -> {
                     Map<String, Object> pago = pagoDeLaMatricula(actor);
+
                     return pago != null &&
                             Objects.equals(
                                     String.valueOf(pago.get("metodo")),
@@ -73,7 +75,8 @@ public class LaRespuesta {
                 });
     }
 
-    // Convierte, por ejemplo, OP-000000 en OP-\d{6}.
+    // Comprueba el formato del número de operación.
+    // Ejemplo: OP-000000 se convierte en OP-\d{6}.
     public static Question<Boolean> numeroOperacionTieneFormato(String formato) {
         return Question.about("el número de operación tiene formato " + formato)
                 .answeredBy(actor -> {
@@ -89,9 +92,9 @@ public class LaRespuesta {
                         if (caracter == '0') {
                             regex.append("\\d");
                         } else {
-                            regex.append(Pattern.quote(
-                                    String.valueOf(caracter)
-                            ));
+                            regex.append(
+                                    Pattern.quote(String.valueOf(caracter))
+                            );
                         }
                     }
 
@@ -107,7 +110,7 @@ public class LaRespuesta {
 
         Number idMatricula = actor.recall("idMatricula");
 
-        if (idMatricula == null) {
+        if (idMatricula == null || SerenityRest.lastResponse() == null) {
             return null;
         }
 
@@ -119,7 +122,9 @@ public class LaRespuesta {
         }
 
         return pagos.stream()
-                .filter(pago -> pago.get("idMatricula") instanceof Number)
+                .filter(pago ->
+                        pago.get("idMatricula") instanceof Number
+                )
                 .filter(pago ->
                         ((Number) pago.get("idMatricula")).longValue()
                                 == idMatricula.longValue()
