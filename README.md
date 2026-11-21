@@ -1,6 +1,6 @@
 ## Pregunta 1: Pruebas automatizadas de matrícula
 
-Se realizaron cinco escenarios de pruebas automatizadas utilizando Cucumber, Gherkin, Serenity BDD, Screenplay y Rest Assured.
+Se realizaron tres escenarios de pruebas automatizadas utilizando Cucumber, Gherkin, Serenity BDD, Screenplay y Rest Assured.
 
 ### Escenario 1: Cotizar curso
 
@@ -8,32 +8,34 @@ Se verifica la cotización del curso, los créditos, el subtotal, el descuento y
 
 ```json
 {
-  "codigoAlumno": "i202610003",
-  "cursos": ["TS5514"],
+  "codigoAlumno": "i202610002",
+  "cursos": [
+    "DM5512"
+  ],
   "creditos": 4,
   "subtotal": 480,
-  "descuento": 0,
-  "total": 480
+  "descuento": 10,
+  "total": 432
 }
 ```
 
 ### Escenario 2: Registrar matrícula
 
-Se verifica que la matrícula se registre correctamente.
+Se verifica que la matrícula se registre correctamente con el monto correspondiente a la cotización.
 
 ```json
 {
-  "id": 21,
-  "codigoAlumno": "i202610003",
-  "codigoCurso": "TS5514",
+  "id": 22,
+  "codigoAlumno": "i202610002",
+  "codigoCurso": "DM5512",
   "periodo": "2026-2",
-  "horario": "JUEVES 08:00-12:00",
+  "horario": "MARTES 08:00-12:00",
   "creditos": 4,
-  "monto": 480,
+  "monto": 432,
   "estado": "REGISTRADA",
   "nota": null,
   "condicion": null,
-  "fechaRegistro": "2026-11-21T00:43:08.5145514",
+  "fechaRegistro": "2026-11-21T00:44:22.8144487",
   "fechaPago": null
 }
 ```
@@ -44,50 +46,50 @@ Se verifica que el pago se procese correctamente y que el estado cambie a PAGADA
 
 ```json
 {
-  "id": 21,
-  "codigoAlumno": "i202610003",
-  "codigoCurso": "TS5514",
+  "id": 22,
+  "codigoAlumno": "i202610002",
+  "codigoCurso": "DM5512",
   "periodo": "2026-2",
-  "horario": "JUEVES 08:00-12:00",
+  "horario": "MARTES 08:00-12:00",
   "creditos": 4,
-  "monto": 480,
+  "monto": 432,
   "estado": "PAGADA",
   "nota": null,
   "condicion": null,
-  "fechaRegistro": "2026-11-21T00:43:08.514551",
-  "fechaPago": "2026-11-21T00:47:22.9929753"
+  "fechaRegistro": "2026-11-21T00:44:22.814449",
+  "fechaPago": "2026-11-21T00:48:13.2353246"
 }
 ```
 
 ### Escenario 4: Verificar pago
 
-Se verifica que el pago esté registrado con el método YAPE y el monto correspondiente.
+Se verifica que el pago esté registrado con el método TRANSFERENCIA y el monto correspondiente.
 
 ```json
 {
-  "id": 16,
-  "numeroOperacion": "OP-000016",
-  "idMatricula": 21,
-  "codigoAlumno": "i202610003",
-  "codigoCurso": "TS5514",
+  "id": 17,
+  "numeroOperacion": "OP-000017",
+  "idMatricula": 22,
+  "codigoAlumno": "i202610002",
+  "codigoCurso": "DM5512",
   "periodo": "2026-2",
-  "metodo": "YAPE",
-  "monto": 480,
-  "fecha": "2026-11-21T00:47:22.992975"
+  "metodo": "TRANSFERENCIA",
+  "monto": 432,
+  "fecha": "2026-11-21T00:48:13.235325"
 }
 ```
 
 ### Escenario 5: Matrícula rechazada
 
-Se verifica que el sistema rechace la matrícula cuando el curso pertenece a otra carrera.
+Se verifica que el sistema rechace la matrícula duplicada cuando el alumno ya se encuentra matriculado en el curso PS5511.
 
 ```json
 {
-  "detail": "El curso AD5101 pertenece a la carrera AE",
+  "detail": "El alumno ya está matriculado en PS5511",
   "instance": "/api/matriculas",
-  "status": 422,
-  "title": "Unprocessable Content",
-  "codigo": "CURSO_DE_OTRA_CARRERA"
+  "status": 409,
+  "title": "Conflict",
+  "codigo": "MATRICULA_DUPLICADA"
 }
 ```
 
@@ -99,11 +101,10 @@ Para ejecutar los escenarios automatizados:
 .\mvnw.cmd test -Dtest=CucumberTestSuite
 ```
 
-**Resultado:** Los cinco escenarios se ejecutan mediante Serenity BDD y Cucumber.
+**Resultado:** Los tres escenarios se ejecutan mediante Serenity BDD y Cucumber, incluyendo la cotización, matrícula y pago, y el rechazo por matrícula duplicada.
 
-## **_Evidencias_**
+## Evidencias
 
-Las capturas de los resultados se encuentran en la carpeta evidencias/:
+Las capturas de los resultados se encuentran en la carpeta `evidencias/`:
 
-
-01-ejecucion-todos-los-tests.png
+- `01-ejecucion-todos-los-tests.png`
